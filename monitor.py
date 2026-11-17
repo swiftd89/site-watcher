@@ -102,7 +102,8 @@ def send_discord(webhook_url, title, description, url=None, color=3447003):
     }
     if url:
         embed["url"] = url
-    requests.post(webhook_url, json={"embeds": [embed]}, timeout=15)
+    r = requests.post(webhook_url, json={"embeds": [embed]}, timeout=15)
+    print(f"Discord webhook response: {r.status_code}")
 
 
 def send_ntfy(topic, title, message, url=None):
@@ -122,7 +123,7 @@ def send_ntfy(topic, title, message, url=None):
 def dispatch_notification(site, settings, title, preview, url):
     method = site.get("notify_method", "default")
     target = (site.get("notify_target") or "").strip()
-    global_discord = (settings.get("discord_webhook") or "").strip()
+    global_discord = (os.environ.get("DISCORD_WEBHOOK") or settings.get("discord_webhook") or "").strip()
     global_ntfy = (settings.get("ntfy_topic") or "").strip()
 
     try:
@@ -240,7 +241,7 @@ def run_once(force=False):
             pw_manager.stop()
 
     if checked_names and changes_count == 0:
-        global_discord = (settings.get("discord_webhook") or "").strip()
+        global_discord = (os.environ.get("DISCORD_WEBHOOK") or settings.get("discord_webhook") or "").strip()
         global_ntfy = (settings.get("ntfy_topic") or "").strip()
         summary = "No changes detected on:\n" + "\n".join(checked_names)
         try:
