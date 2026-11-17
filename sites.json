@@ -33,6 +33,21 @@
       "last_checked": null,
       "last_changed": null,
       "status": "pending"
+    },
+    {
+      "id": "site-1794948811440",
+      "name": "httpbin.org",
+      "url": "https://httpbin.org/uuid",
+      "selector": "body",
+      "interval_value": 5,
+      "interval_unit": "minutes",
+      "notify_method": "default",
+      "notify_target": "",
+      "use_browser": false,
+      "enabled": true,
+      "last_checked": null,
+      "last_changed": null,
+      "status": "pending"
     }
   ]
 }
