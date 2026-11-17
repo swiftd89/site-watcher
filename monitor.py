@@ -258,16 +258,7 @@ def run_once(force=False):
             pw_manager.stop()
 
     if checked_names and changes_count == 0:
-        global_discord = (os.environ.get("DISCORD_WEBHOOK") or settings.get("discord_webhook") or "").strip()
-        global_ntfy = (settings.get("ntfy_topic") or "").strip()
-        summary = "No changes detected on:\n" + "\n".join(checked_names)
-        try:
-            if global_discord:
-                send_discord(global_discord, "✅ Check Complete — No Changes", summary, color=9807270)
-            if global_ntfy:
-                send_ntfy(global_ntfy, "Check Complete — No Changes", summary)
-        except Exception as e:
-            print(f"Summary notification error: {e}")
+        print("No changes detected across checked sites (notification suppressed).")
 
     save_json(SITES_FILE, config)
     save_json(STATE_FILE, state)
