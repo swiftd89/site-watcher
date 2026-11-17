@@ -15,9 +15,9 @@
       "notify_target": "",
       "use_browser": true,
       "enabled": true,
-      "last_checked": "2026-11-17 20:27 UTC",
+      "last_checked": "2026-11-17 20:32 UTC",
       "last_changed": null,
-      "status": "unchanged"
+      "status": "error: selector 'div.bstn-hl-wrapper > div.bstn-hl.type-materia > a.bstn-hl-link > ul.bstn-hl-list' not found"
     },
     {
       "id": "site-1794947198127",
@@ -30,7 +30,7 @@
       "notify_target": "",
       "use_browser": false,
       "enabled": true,
-      "last_checked": "2026-11-17 20:27 UTC",
+      "last_checked": "2026-11-17 20:32 UTC",
       "last_changed": null,
       "status": "error: selector '.vduoHb > span' not found"
     }
