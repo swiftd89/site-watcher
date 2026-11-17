@@ -3,21 +3,5 @@
     "discord_webhook": "",
     "ntfy_topic": ""
   },
-  "sites": [
-    {
-      "id": "site-1794942962533",
-      "name": "ge.globo - É esporte sempre",
-      "url": "https://ge.globo.com/",
-      "selector": "div.glb-grid > main.glb-grid.grid-24 > div.row.small-collapse > div.small-24.column > div._evt > div.bstn-hls.xlarge-22 > div._evg > div.bstn-hl-wrapper > div.bstn-hl.type-materia > a.bstn-hl-link > ul.bstn-hl-list > li.bstn-hl-itemlist.bstn-hl-spaceritem",
-      "interval_value": 1,
-      "interval_unit": "days",
-      "notify_method": "default",
-      "notify_target": "",
-      "use_browser": false,
-      "enabled": true,
-      "last_checked": "2026-11-17 20:23 UTC",
-      "last_changed": null,
-      "status": "error: selector 'div.glb-grid > main.glb-grid.grid-24 > div.row.small-collapse > div.small-24.column > div._evt > div.bstn-hls.xlarge-22 > div._evg > div.bstn-hl-wrapper > div.bstn-hl.type-materia > a.bstn-hl-link > ul.bstn-hl-list > li.bstn-hl-itemlist.bstn-hl-spaceritem' not found"
-    }
-  ]
+  "sites": []
 }
