@@ -3,5 +3,21 @@
     "discord_webhook": "",
     "ntfy_topic": ""
   },
-  "sites": []
+  "sites": [
+    {
+      "id": "site-1794947767646",
+      "name": "Apple - Support - System Status",
+      "url": "https://www.apple.com/support/systemstatus/",
+      "selector": "#info-tooltip-wrapper-19 > div.light-container > div.light-content.light-image > div.light-issue",
+      "interval_value": 1,
+      "interval_unit": "days",
+      "notify_method": "default",
+      "notify_target": "",
+      "use_browser": false,
+      "enabled": true,
+      "last_checked": null,
+      "last_changed": null,
+      "status": "pending"
+    }
+  ]
 }
