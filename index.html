@@ -115,7 +115,13 @@
         });
         window.history.replaceState({}, "", window.location.pathname);
         await pushSites(`Added: ${params.get("name")}`);
-        banner(`✅ Now tracking "${params.get("name")}"!`);
+        await fetch(`https://api.github.com/repos/${USER}/${REPO}/actions/workflows/check-sites.yml/dispatches`, {
+          method: "POST",
+          headers: headers(),
+          body: JSON.stringify({ ref: "main", inputs: { force_all: "false" } })
+        });
+        banner(`✅ Added "${params.get("name")}" & capturing initial baseline (~35s)...`);
+        setTimeout(() => loadSites(), 40000);
       }
     };
 
