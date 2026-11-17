@@ -20,21 +20,6 @@
       "status": "unchanged"
     },
     {
-      "id": "site-1794947791914",
-      "name": "ge.globo - É esporte sempre",
-      "url": "https://ge.globo.com/",
-      "selector": "div.bstn-hl-wrapper > div.bstn-hl.type-materia > a.bstn-hl-link > ul.bstn-hl-list",
-      "interval_value": 1,
-      "interval_unit": "days",
-      "notify_method": "default",
-      "notify_target": "",
-      "use_browser": true,
-      "enabled": true,
-      "last_checked": "2026-11-17 20:45 UTC",
-      "last_changed": "2026-11-17 20:45 UTC",
-      "status": "changed"
-    },
-    {
       "id": "site-1794948073544",
       "name": "httpbin.org",
       "url": "https://httpbin.org/uuid",
