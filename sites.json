@@ -48,6 +48,21 @@
       "last_checked": null,
       "last_changed": null,
       "status": "pending"
+    },
+    {
+      "id": "site-1794948086757",
+      "name": "www.uuidgenerator.net",
+      "url": "https://www.uuidgenerator.net/api/version4",
+      "selector": "pre",
+      "interval_value": 1,
+      "interval_unit": "days",
+      "notify_method": "default",
+      "notify_target": "",
+      "use_browser": false,
+      "enabled": true,
+      "last_checked": null,
+      "last_changed": null,
+      "status": "pending"
     }
   ]
 }
