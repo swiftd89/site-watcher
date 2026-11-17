@@ -4,7 +4,7 @@ import json
 import os
 import re
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
@@ -17,7 +17,7 @@ UNIT_SECONDS = {
     "hours": 3600,
     "days": 86400,
     "weeks": 604800,
-    "months": 2592000,  # 30 days
+    "months": 2592000,
 }
 
 
@@ -72,31 +72,31 @@ def fetch_browser(url, playwright):
     return html
 
 
-def send_discord(webhook_url, title, preview, url):
+def send_discord(webhook_url, title, description, url=None, color=3447003):
     if not webhook_url:
         return
-    payload = {
-        "embeds": [
-            {
-                "title": f"🔔 {title}",
-                "url": url,
-                "description": f"**Change detected!**\n\n> {preview[:350]}...",
-                "color": 3447003,
-                "footer": {"text": "Site Watcher"},
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            }
-        ]
+    embed = {
+        "title": title,
+        "description": description,
+        "color": color,
+        "footer": {"text": "Site Watcher"},
+        "timestamp": datetime.now(timezone.utc).isoformat(),
     }
-    requests.post(webhook_url, json=payload, timeout=15)
+    if url:
+        embed["url"] = url
+    requests.post(webhook_url, json={"embeds": [embed]}, timeout=15)
 
 
-def send_ntfy(topic, title, preview, url):
+def send_ntfy(topic, title, message, url=None):
     if not topic:
         return
+    headers = {"Title": title, "Tags": "bell,eyes"}
+    if url:
+        headers["Click"] = url
     requests.post(
         f"https://ntfy.sh/{topic}",
-        data=f"Updated preview: {preview[:200]}...".encode("utf-8"),
-        headers={"Title": title, "Click": url, "Tags": "bell,eyes"},
+        data=message.encode("utf-8"),
+        headers=headers,
         timeout=15,
     )
 
@@ -111,17 +111,17 @@ def dispatch_notification(site, settings, title, preview, url):
         if method == "none":
             return
         elif method == "discord":
-            send_discord(target or global_discord, title, preview, url)
+            send_discord(target or global_discord, f"🔔 {title}", f"**Change detected!**\n\n> {preview[:350]}...", url, color=3066993)
         elif method == "ntfy":
-            send_ntfy(target or global_ntfy, title, preview, url)
+            send_ntfy(target or global_ntfy, title, f"Updated preview: {preview[:200]}...", url)
         elif method == "both":
-            send_discord(global_discord, title, preview, url)
-            send_ntfy(global_ntfy, title, preview, url)
-        else:  # "default" -> uses whichever global channels are configured
+            send_discord(global_discord, f"🔔 {title}", f"**Change detected!**\n\n> {preview[:350]}...", url, color=3066993)
+            send_ntfy(global_ntfy, title, f"Updated preview: {preview[:200]}...", url)
+        else:
             if global_discord:
-                send_discord(global_discord, title, preview, url)
+                send_discord(global_discord, f"🔔 {title}", f"**Change detected!**\n\n> {preview[:350]}...", url, color=3066993)
             if global_ntfy:
-                send_ntfy(global_ntfy, title, preview, url)
+                send_ntfy(global_ntfy, title, f"Updated preview: {preview[:200]}...", url)
     except Exception as e:
         print(f"Notification error for {title}: {e}")
 
@@ -142,7 +142,6 @@ def is_due(site, now_utc, force=False):
     val = max(1, int(site.get("interval_value", 1)))
     unit = site.get("interval_unit", "days")
     required_seconds = val * UNIT_SECONDS.get(unit, 86400)
-    # Subtract 90s buffer so hourly GitHub cron jitter doesn't skip a cycle
     elapsed = (now_utc - last_dt).total_seconds()
     return elapsed >= max(30, required_seconds - 90)
 
@@ -161,6 +160,8 @@ def run_once(force=False):
 
     needs_browser = any(s.get("use_browser") for s in due_sites)
     pw_manager = sync_playwright().start() if needs_browser else None
+    changes_count = 0
+    checked_names = []
 
     try:
         for site in due_sites:
@@ -180,6 +181,7 @@ def run_once(force=False):
                 if extracted is None:
                     site["status"] = f"error: selector '{selector}' not found"
                     site["last_checked"] = now_iso
+                    checked_names.append(f"⚠️ {name} (selector not found)")
                     continue
 
                 content_hash = hashlib.sha256(extracted.encode("utf-8")).hexdigest()
@@ -188,23 +190,40 @@ def run_once(force=False):
                 if prev is None:
                     state[site_id] = {"hash": content_hash, "snippet": extracted[:350]}
                     site["status"] = "baseline saved"
+                    checked_names.append(f"🆕 {name} (baseline saved)")
                 elif prev["hash"] != content_hash:
                     state[site_id] = {"hash": content_hash, "snippet": extracted[:350]}
                     site["last_changed"] = now_iso
                     site["status"] = "changed"
+                    changes_count += 1
                     dispatch_notification(site, settings, name, extracted, url)
                     print(f" -> CHANGE DETECTED: {name}")
                 else:
                     site["status"] = "unchanged"
+                    checked_names.append(f"• {name}")
 
                 site["last_checked"] = now_iso
             except Exception as err:
                 site["status"] = f"error: {str(err)[:80]}"
                 site["last_checked"] = now_iso
+                checked_names.append(f"❌ {name} (error)")
                 print(f" -> Error on {name}: {err}")
     finally:
         if pw_manager:
             pw_manager.stop()
+
+    # Send a summary notification if sites were checked and none changed
+    if checked_names and changes_count == 0:
+        global_discord = (settings.get("discord_webhook") or "").strip()
+        global_ntfy = (settings.get("ntfy_topic") or "").strip()
+        summary = "No changes detected on:\n" + "\n".join(checked_names)
+        try:
+            if global_discord:
+                send_discord(global_discord, "✅ Check Complete — No Changes", summary, color=9807270)
+            if global_ntfy:
+                send_ntfy(global_ntfy, "Check Complete — No Changes", summary)
+        except Exception as e:
+            print(f"Summary notification error: {e}")
 
     save_json(SITES_FILE, config)
     save_json(STATE_FILE, state)
