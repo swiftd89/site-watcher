@@ -15,9 +15,9 @@
       "notify_target": "",
       "use_browser": false,
       "enabled": true,
-      "last_checked": null,
+      "last_checked": "2026-11-17 19:16 UTC",
       "last_changed": null,
-      "status": "pending"
+      "status": "error: selector 'div.glb-grid > main.glb-grid.grid-24 > div.row.small-collapse > div.small-24.column > div._evt > div.bstn-hls.xlarge-22 > div._evg > div.bstn-hl-wrapper > div.bstn-hl.type-materia > a.bstn-hl-link > ul.bstn-hl-list > li.bstn-hl-itemlist.bstn-hl-spaceritem' not found"
     }
   ]
 }
