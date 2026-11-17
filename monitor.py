@@ -3,6 +3,8 @@ import hashlib
 import json
 import os
 import re
+import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 import requests
@@ -56,8 +58,24 @@ def fetch_static(url):
     return resp.text
 
 
+def ensure_chromium():
+    subprocess.run(
+        [sys.executable, "-m", "playwright", "install", "chromium"],
+        check=True,
+    )
+
+
 def fetch_browser(url, playwright):
-    browser = playwright.chromium.launch(headless=True)
+    try:
+        browser = playwright.chromium.launch(headless=True)
+    except Exception as e:
+        if "Executable doesn't exist" in str(e):
+            print("Installing Chromium on runner...")
+            ensure_chromium()
+            browser = playwright.chromium.launch(headless=True)
+        else:
+            raise
+
     context = browser.new_context(
         user_agent=(
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -180,7 +198,6 @@ def run_once(force=False):
                     html = fetch_static(url)
                     extracted = clean_text(html, selector)
 
-                # Auto-fallback to headless Chromium if JS rendering is needed
                 if extracted is None:
                     print(f" -> Using JS browser for {name}...")
                     html = fetch_browser(url, get_pw())
