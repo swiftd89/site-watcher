@@ -15,9 +15,9 @@
       "notify_target": "",
       "use_browser": false,
       "enabled": true,
-      "last_checked": "2026-11-17 20:50 UTC",
+      "last_checked": "2026-11-17 21:17 UTC",
       "last_changed": null,
-      "status": "baseline saved"
+      "status": "unchanged"
     },
     {
       "id": "site-1794948786487",
@@ -30,9 +30,9 @@
       "notify_target": "",
       "use_browser": true,
       "enabled": true,
-      "last_checked": "2026-11-17 20:54 UTC",
+      "last_checked": "2026-11-17 21:17 UTC",
       "last_changed": null,
-      "status": "baseline saved"
+      "status": "unchanged"
     },
     {
       "id": "site-1794948811440",
@@ -45,9 +45,9 @@
       "notify_target": "",
       "use_browser": true,
       "enabled": true,
-      "last_checked": "2026-11-17 20:54 UTC",
-      "last_changed": null,
-      "status": "baseline saved"
+      "last_checked": "2026-11-17 21:17 UTC",
+      "last_changed": "2026-11-17 21:17 UTC",
+      "status": "changed"
     }
   ]
 }
