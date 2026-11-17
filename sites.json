@@ -15,7 +15,7 @@
       "notify_target": "",
       "use_browser": true,
       "enabled": true,
-      "last_checked": "2026-11-17 20:38 UTC",
+      "last_checked": "2026-11-17 20:42 UTC",
       "last_changed": null,
       "status": "unchanged"
     },
@@ -30,7 +30,7 @@
       "notify_target": "",
       "use_browser": true,
       "enabled": true,
-      "last_checked": "2026-11-17 20:38 UTC",
+      "last_checked": "2026-11-17 20:42 UTC",
       "last_changed": null,
       "status": "unchanged"
     },
@@ -45,9 +45,9 @@
       "notify_target": "",
       "use_browser": true,
       "enabled": true,
-      "last_checked": "2026-11-17 20:41 UTC",
-      "last_changed": null,
-      "status": "baseline saved"
+      "last_checked": "2026-11-17 20:42 UTC",
+      "last_changed": "2026-11-17 20:42 UTC",
+      "status": "changed"
     },
     {
       "id": "site-1794948086757",
@@ -60,7 +60,7 @@
       "notify_target": "",
       "use_browser": false,
       "enabled": true,
-      "last_checked": "2026-11-17 20:41 UTC",
+      "last_checked": "2026-11-17 20:42 UTC",
       "last_changed": null,
       "status": "error: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without"
     }
