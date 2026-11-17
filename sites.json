@@ -5,21 +5,6 @@
   },
   "sites": [
     {
-      "id": "site-1794947767646",
-      "name": "Apple - Support - System Status",
-      "url": "https://www.apple.com/support/systemstatus/",
-      "selector": "#info-tooltip-wrapper-19 > div.light-container > div.light-content.light-image > div.light-issue",
-      "interval_value": 1,
-      "interval_unit": "days",
-      "notify_method": "default",
-      "notify_target": "",
-      "use_browser": true,
-      "enabled": true,
-      "last_checked": "2026-11-17 20:46 UTC",
-      "last_changed": null,
-      "status": "unchanged"
-    },
-    {
       "id": "site-1794948590475",
       "name": "Ph.D. in Neuroscience – The Regular Track | Sagol ",
       "url": "https://en-sagol.tau.ac.il/PhD-in-neuroscience-The-Regular-Track",
