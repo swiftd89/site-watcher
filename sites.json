@@ -3,21 +3,5 @@
     "discord_webhook": "",
     "ntfy_topic": ""
   },
-  "sites": [
-    {
-      "id": "site-1",
-      "name": "Example Page",
-      "url": "https://example.com",
-      "selector": "body",
-      "interval_value": 1,
-      "interval_unit": "days",
-      "notify_method": "default",
-      "notify_target": "",
-      "use_browser": false,
-      "enabled": true,
-      "last_checked": "2026-11-17 19:15 UTC",
-      "last_changed": null,
-      "status": "baseline saved"
-    }
-  ]
+  "sites": []
 }
