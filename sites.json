@@ -18,6 +18,21 @@
       "last_checked": "2026-11-17 20:46 UTC",
       "last_changed": null,
       "status": "unchanged"
+    },
+    {
+      "id": "site-1794948590475",
+      "name": "Ph.D. in Neuroscience – The Regular Track | Sagol ",
+      "url": "https://en-sagol.tau.ac.il/PhD-in-neuroscience-The-Regular-Track",
+      "selector": ".rteleft",
+      "interval_value": 1,
+      "interval_unit": "weeks",
+      "notify_method": "default",
+      "notify_target": "",
+      "use_browser": false,
+      "enabled": true,
+      "last_checked": null,
+      "last_changed": null,
+      "status": "pending"
     }
   ]
 }
