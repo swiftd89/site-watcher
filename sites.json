@@ -3,5 +3,21 @@
     "discord_webhook": "",
     "ntfy_topic": ""
   },
-  "sites": []
+  "sites": [
+    {
+      "id": "site-1794947108093",
+      "name": "ge.globo - É esporte sempre",
+      "url": "https://ge.globo.com/",
+      "selector": "div.bstn-hl-wrapper > div.bstn-hl.type-materia > a.bstn-hl-link > ul.bstn-hl-list",
+      "interval_value": 1,
+      "interval_unit": "days",
+      "notify_method": "default",
+      "notify_target": "",
+      "use_browser": false,
+      "enabled": true,
+      "last_checked": null,
+      "last_changed": null,
+      "status": "pending"
+    }
+  ]
 }
