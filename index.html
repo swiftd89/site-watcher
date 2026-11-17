@@ -198,13 +198,13 @@
       }
       list.innerHTML = configData.sites.map((s, i) => `
         <div class="site" style="opacity:${s.enabled ? 1 : 0.55}">
-          <div>
+          <div style="min-width:0; flex:1; overflow-wrap:anywhere;">
             <strong>${s.name}</strong>
             <span class="badge ${s.status === 'changed' ? 'changed' : s.status?.startsWith('error') ? 'error' : ''}">${s.enabled ? (s.status || 'pending') : 'paused'}</span>
             <span class="badge">Every ${s.interval_value} ${s.interval_unit}</span>
             <div class="meta">${s.url} • ${s.selector === 'body' ? 'Whole page' : 'Selected element'} • Checked: ${s.last_checked || 'Pending'}</div>
           </div>
-          <div style="display:flex; gap:6px;">
+          <div style="display:flex; gap:6px; flex-shrink:0;">
             <button class="pause" onclick="togglePause(${i})">${s.enabled ? 'Pause' : 'Resume'}</button>
             <button class="danger" onclick="removeSite(${i})">Remove</button>
           </div>
