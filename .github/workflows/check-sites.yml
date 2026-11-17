@@ -25,16 +25,14 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install base dependencies
-        run: pip install requests beautifulsoup4 playwright
-
-      - name: Install Chromium only if needed
+      - name: Install dependencies
         run: |
-          if grep -q '"use_browser": true' sites.json; then
-            python -m playwright install chromium --with-deps
-          fi
+          pip install requests beautifulsoup4 playwright
+          python -m playwright install chromium --with-deps
 
       - name: Run website monitor
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
           if [ "${{ github.event.inputs.force_all }}" = "true" ]; then
             python monitor.py --force
