@@ -13,11 +13,11 @@
       "interval_unit": "days",
       "notify_method": "default",
       "notify_target": "",
-      "use_browser": false,
+      "use_browser": true,
       "enabled": true,
-      "last_checked": null,
+      "last_checked": "2026-11-17 20:37 UTC",
       "last_changed": null,
-      "status": "pending"
+      "status": "baseline saved"
     },
     {
       "id": "site-1794947791914",
@@ -28,11 +28,11 @@
       "interval_unit": "days",
       "notify_method": "default",
       "notify_target": "",
-      "use_browser": false,
+      "use_browser": true,
       "enabled": true,
-      "last_checked": null,
+      "last_checked": "2026-11-17 20:37 UTC",
       "last_changed": null,
-      "status": "pending"
+      "status": "baseline saved"
     }
   ]
 }
