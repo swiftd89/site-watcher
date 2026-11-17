@@ -3,21 +3,5 @@
     "discord_webhook": "",
     "ntfy_topic": ""
   },
-  "sites": [
-    {
-      "id": "site-1794947198127",
-      "name": "time - Google Search",
-      "url": "https://www.google.com/search?q=time&rlz=1C5CHFA_enIL980IL980&oq=time&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQABiABDIHCAIQABiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBBzY2NGowajeoAgCwAgA&sourceid=chrome&source=chrome.ob&ie=UTF-8",
-      "selector": ".vduoHb > span",
-      "interval_value": 1,
-      "interval_unit": "days",
-      "notify_method": "default",
-      "notify_target": "",
-      "use_browser": false,
-      "enabled": true,
-      "last_checked": "2026-11-17 20:32 UTC",
-      "last_changed": null,
-      "status": "error: selector '.vduoHb > span' not found"
-    }
-  ]
+  "sites": []
 }
