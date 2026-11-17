@@ -5,22 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Site Watcher</title>
   <style>
-    :root { --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --accent: #3b82f6; --green: #22c55e; --red: #ef4444; }
+    :root { --bg: #0f172a; --card: #1e293b; --border: #334155; --text: #f8fafc; --muted: #94a3b8; --accent: #3b82f6; --green: #22c55e; --red: #ef4444; --amber: #f59e0b; }
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { background: var(--bg); color: var(--text); max-width: 680px; margin: 0 auto; padding: 28px 16px; }
+    body { background: var(--bg); color: var(--text); max-width: 720px; margin: 0 auto; padding: 28px 16px; }
     h1 { margin: 0 0 6px; font-size: 1.4rem; }
     p.sub { color: var(--muted); margin: 0 0 20px; font-size: 0.9rem; }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
     .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
     input, select { background: #0f172a; border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 8px; font-size: 0.9rem; flex: 1; min-width: 140px; }
     button { background: var(--accent); color: #fff; border: none; padding: 9px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.88rem; }
+    button:disabled { opacity: 0.55; cursor: wait; }
     button.sec { background: #334155; }
     button.green { background: var(--green); color: #052e16; }
     button.danger { background: transparent; color: var(--red); border: 1px solid var(--red); padding: 4px 8px; font-size: 0.78rem; }
+    button.pause { background: transparent; color: var(--amber); border: 1px solid var(--amber); padding: 4px 8px; font-size: 0.78rem; }
     .site { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
     .site:last-child { border-bottom: none; }
     .badge { font-size: 0.72rem; padding: 2px 8px; border-radius: 99px; background: #334155; color: var(--muted); margin-left: 6px; }
     .badge.changed { background: rgba(34,197,94,0.2); color: var(--green); }
+    .badge.error { background: rgba(239,68,68,0.2); color: var(--red); }
     .meta { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
     .bookmark-btn { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: grab; }
     #statusBanner { padding: 12px; border-radius: 8px; background: rgba(59,130,246,0.15); border: 1px solid var(--accent); margin-bottom: 16px; display: none; font-size: 0.9rem; }
@@ -28,14 +31,14 @@
 </head>
 <body>
   <h1>Site Watcher</h1>
-  <p class="sub">Drag the button below to your Chrome Bookmarks Bar once, then click it on any website.</p>
+  <p class="sub">Click your bookmark on any page to track it, or manage existing trackers below.</p>
 
   <div id="statusBanner"></div>
 
   <div class="card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
     <div>
-      <strong>1-Click Tracker Button</strong>
-      <div class="meta">Drag this blue button up to your Chrome bookmarks bar:</div>
+      <strong>1-Click Tracker Bookmark</strong>
+      <div class="meta">Drag this blue button up to your Chrome bookmarks bar (replace the old one):</div>
     </div>
     <a id="bookmarkletLink" class="bookmark-btn" href="#">📌 Track This Site</a>
   </div>
@@ -43,14 +46,17 @@
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
       <strong>Tracked Websites (<span id="count">0</span>)</strong>
-      <button class="sec" onclick="triggerRun()">Check All Now</button>
+      <div style="display:flex; gap:8px;">
+        <button class="sec" onclick="loadSites()">Refresh</button>
+        <button id="checkBtn" class="green" onclick="triggerRun()">Check All Now</button>
+      </div>
     </div>
     <div id="siteList"><p class="meta">Complete one-time setup below to connect.</p></div>
   </div>
 
   <div class="card">
     <details id="setupBox">
-      <summary style="cursor:pointer; font-weight:600;">One-Time Setup (GitHub Token & Discord Webhook)</summary>
+      <summary style="cursor:pointer; font-weight:600;">Setup & Notification Settings</summary>
       <div class="row" style="margin-top:12px;">
         <input id="ghToken" type="password" placeholder="GitHub Token (github_pat_...)" />
         <input id="discordWebhook" placeholder="Discord Webhook URL" />
@@ -66,8 +72,8 @@
     let fileSha = null;
     let configData = { settings: { discord_webhook: "", ntfy_topic: "" }, sites: [] };
 
-    // Build the self-contained bookmarklet code
-    const bmCode = `javascript:(()=>{if(document.getElementById('__sw_bar'))return;const bar=document.createElement('div');bar.id='__sw_bar';bar.style.cssText='position:fixed;top:14px;right:14px;z-index:2147483647;background:#0f172a;color:#f8fafc;padding:14px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.45);font-family:-apple-system,sans-serif;font-size:14px;border:1px solid #334155;min-width:270px;';bar.innerHTML='<div style="font-weight:700;margin-bottom:6px;">📌 Click any part of the page</div><div style="color:#94a3b8;font-size:12px;margin-bottom:10px;">Hover over text/price and click, or track the whole page:</div><div style="display:flex;gap:8px;"><button id="__sw_whole" style="flex:1;background:#3b82f6;color:#fff;border:none;padding:7px 10px;border-radius:6px;font-weight:600;cursor:pointer;">Whole Page</button><button id="__sw_cancel" style="background:#334155;color:#fff;border:none;padding:7px 10px;border-radius:6px;cursor:pointer;">Cancel</button></div>';document.body.appendChild(bar);const box=document.createElement('div');box.style.cssText='position:fixed;pointer-events:none;border:2px solid #3b82f6;background:rgba(59,130,246,0.18);z-index:2147483646;transition:all 0.04s;';document.body.appendChild(box);const css=e=>{if(e.id)return'#'+CSS.escape(e.id);let p=[];while(e&&e.nodeType===1&&e!==document.body){let s=e.tagName.toLowerCase();if(e.className&&typeof e.className==='string'){let c=e.className.trim().split(/\\s+/).filter(x=>!/[:\\[\\]]/.test(x)).slice(0,2);if(c.length)s+='.'+c.map(CSS.escape).join('.');}p.unshift(s);e=e.parentElement;}return p.join(' > ')||'body';};const showForm=sel=>{cleanupHover();bar.innerHTML='<div style="font-weight:700;margin-bottom:8px;">Track: '+(sel==='body'?'Whole Page':'Selected Element')+'</div><label style="font-size:12px;color:#94a3b8;">Check frequency:</label><select id="__sw_freq" style="width:100%;margin:4px 0 10px;padding:7px;border-radius:6px;background:#1e293b;color:#fff;border:1px solid #334155;"><option value="1:hours">Every Hour</option><option value="1:days" selected>Every Day</option><option value="1:weeks">Every Week</option><option value="1:months">Every Month</option></select><div style="display:flex;gap:8px;"><button id="__sw_go" style="flex:1;background:#22c55e;color:#052e16;border:none;padding:8px;border-radius:6px;font-weight:700;cursor:pointer;">Start Tracking</button><button id="__sw_close" style="background:#334155;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;">✕</button></div>';document.getElementById('__sw_close').onclick=()=>bar.remove();document.getElementById('__sw_go').onclick=()=>{const[val,unit]=document.getElementById('__sw_freq').value.split(':');const q=new URLSearchParams({add:'1',name:document.title.slice(0,50)||location.hostname,url:location.href,selector:sel,val,unit});window.open('${APP_URL}?'+q.toString(),'_blank');bar.remove();};};const mv=e=>{if(bar.contains(e.target))return;const r=e.target.getBoundingClientRect();box.style.top=r.top+'px';box.style.left=r.left+'px';box.style.width=r.width+'px';box.style.height=r.height+'px';};const cl=e=>{if(bar.contains(e.target))return;e.preventDefault();e.stopPropagation();showForm(css(e.target));};const cleanupHover=()=>{document.removeEventListener('mousemove',mv,true);document.removeEventListener('click',cl,true);box.remove();};document.getElementById('__sw_whole').onclick=()=>showForm('body');document.getElementById('__sw_cancel').onclick=()=>{cleanupHover();bar.remove();};document.addEventListener('mousemove',mv,true);document.addEventListener('click',cl,true);})();`;
+    // Smarter selector generator: stops at unique class/ID instead of fragile 12-level paths
+    const bmCode = `javascript:(()=>{if(document.getElementById('__sw_bar'))return;const bar=document.createElement('div');bar.id='__sw_bar';bar.style.cssText='position:fixed;top:14px;right:14px;z-index:2147483647;background:#0f172a;color:#f8fafc;padding:14px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.45);font-family:-apple-system,sans-serif;font-size:14px;border:1px solid #334155;min-width:280px;';bar.innerHTML='<div style="font-weight:700;margin-bottom:6px;">📌 Click any part of the page</div><div style="color:#94a3b8;font-size:12px;margin-bottom:10px;">Hover over text/price and click, or track the whole page:</div><div style="display:flex;gap:6px;"><button id="__sw_whole" style="flex:1;background:#3b82f6;color:#fff;border:none;padding:7px 10px;border-radius:6px;font-weight:600;cursor:pointer;">Whole Page</button><a href="${APP_URL}" target="_blank" style="background:#334155;color:#fff;text-decoration:none;padding:7px 10px;border-radius:6px;font-size:12px;display:flex;align-items:center;">Manage</a><button id="__sw_cancel" style="background:#334155;color:#fff;border:none;padding:7px 10px;border-radius:6px;cursor:pointer;">✕</button></div>';document.body.appendChild(bar);const box=document.createElement('div');box.style.cssText='position:fixed;pointer-events:none;border:2px solid #3b82f6;background:rgba(59,130,246,0.18);z-index:2147483646;transition:all 0.04s;';document.body.appendChild(box);const css=e=>{if(!e||e===document.body)return'body';if(e.id)return'#'+CSS.escape(e.id);let p=[];while(e&&e.nodeType===1&&e!==document.body&&p.length<4){if(e.id){p.unshift('#'+CSS.escape(e.id));break;}let s=e.tagName.toLowerCase();if(e.className&&typeof e.className==='string'){let c=e.className.trim().split(/\\s+/).filter(x=>!/[:\\[\\]]/.test(x)).slice(0,2);if(c.length){let cs='.'+c.map(CSS.escape).join('.');if(document.querySelectorAll(cs).length===1){p.unshift(cs);break;}s+=cs;}}p.unshift(s);e=e.parentElement;}return p.join(' > ')||'body';};const showForm=sel=>{cleanupHover();bar.innerHTML='<div style="font-weight:700;margin-bottom:8px;">Track: '+(sel==='body'?'Whole Page':'Selected Element')+'</div><label style="font-size:12px;color:#94a3b8;">Check frequency:</label><select id="__sw_freq" style="width:100%;margin:4px 0 10px;padding:7px;border-radius:6px;background:#1e293b;color:#fff;border:1px solid #334155;"><option value="1:hours">Every Hour</option><option value="1:days" selected>Every Day</option><option value="1:weeks">Every Week</option><option value="1:months">Every Month</option></select><div style="display:flex;gap:8px;"><button id="__sw_go" style="flex:1;background:#22c55e;color:#052e16;border:none;padding:8px;border-radius:6px;font-weight:700;cursor:pointer;">Start Tracking</button><button id="__sw_close" style="background:#334155;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;">✕</button></div>';document.getElementById('__sw_close').onclick=()=>bar.remove();document.getElementById('__sw_go').onclick=()=>{const[val,unit]=document.getElementById('__sw_freq').value.split(':');const q=new URLSearchParams({add:'1',name:document.title.slice(0,50)||location.hostname,url:location.href,selector:sel,val,unit});window.open('${APP_URL}?'+q.toString(),'_blank');bar.remove();};};const mv=e=>{if(bar.contains(e.target))return;const r=e.target.getBoundingClientRect();box.style.top=r.top+'px';box.style.left=r.left+'px';box.style.width=r.width+'px';box.style.height=r.height+'px';};const cl=e=>{if(bar.contains(e.target))return;e.preventDefault();e.stopPropagation();showForm(css(e.target));};const cleanupHover=()=>{document.removeEventListener('mousemove',mv,true);document.removeEventListener('click',cl,true);box.remove();};document.getElementById('__sw_whole').onclick=()=>showForm('body');document.getElementById('__sw_cancel').onclick=()=>{cleanupHover();bar.remove();};document.addEventListener('mousemove',mv,true);document.addEventListener('click',cl,true);})();`;
     document.getElementById("bookmarkletLink").href = bmCode;
 
     function banner(msg, isErr = false) {
@@ -86,14 +92,10 @@
 
     window.onload = async () => {
       const savedToken = localStorage.getItem("ghToken");
-      if (!savedToken) {
-        document.getElementById("setupBox").open = true;
-        return;
-      }
+      if (!savedToken) { document.getElementById("setupBox").open = true; return; }
       document.getElementById("ghToken").value = savedToken;
       await loadSites();
 
-      // Check if opened from the bookmarklet with a new site to save
       const params = new URLSearchParams(window.location.search);
       if (params.get("add") === "1") {
         configData.sites.push({
@@ -113,7 +115,7 @@
         });
         window.history.replaceState({}, "", window.location.pathname);
         await pushSites(`Added: ${params.get("name")}`);
-        banner(`✅ Now tracking "${params.get("name")}"! You can close this tab.`);
+        banner(`✅ Now tracking "${params.get("name")}"!`);
       }
     };
 
@@ -138,14 +140,13 @@
       if (wh) configData.settings.discord_webhook = wh;
       await pushSites("Updated settings");
       document.getElementById("setupBox").open = false;
-      banner("✅ Connected! Now drag '📌 Track This Site' to your Bookmarks Bar.");
+      banner("✅ Connected & saved!");
     }
 
     async function pushSites(msg) {
       const content = btoa(unescape(encodeURIComponent(JSON.stringify(configData, null, 2))));
       const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/contents/sites.json`, {
-        method: "PUT",
-        headers: headers(),
+        method: "PUT", headers: headers(),
         body: JSON.stringify({ message: msg, content, sha: fileSha })
       });
       if (!res.ok) throw new Error("Failed to save to GitHub.");
@@ -153,19 +154,39 @@
       render();
     }
 
+    async function togglePause(i) {
+      configData.sites[i].enabled = !configData.sites[i].enabled;
+      await pushSites("Toggle pause");
+      banner(configData.sites[i].enabled ? "Resumed tracking." : "Paused tracking.");
+    }
+
     async function removeSite(i) {
       configData.sites.splice(i, 1);
       await pushSites("Removed site");
-      banner("Removed site.");
+      banner("Tracking canceled and removed.");
     }
 
     async function triggerRun() {
+      const btn = document.getElementById("checkBtn");
+      btn.disabled = true;
+      btn.textContent = "Checking (~35s)...";
       const res = await fetch(`https://api.github.com/repos/${USER}/${REPO}/actions/workflows/check-sites.yml/dispatches`, {
-        method: "POST",
-        headers: headers(),
+        method: "POST", headers: headers(),
         body: JSON.stringify({ ref: "main", inputs: { force_all: "true" } })
       });
-      if (res.ok) banner("🔍 Checking all sites now...");
+      if (res.ok) {
+        banner("🔍 Cloud check started! Auto-refreshing results in 40 seconds...");
+        setTimeout(async () => {
+          await loadSites();
+          btn.disabled = false;
+          btn.textContent = "Check All Now";
+          banner("✅ Results updated! Check Discord for details.");
+        }, 40000);
+      } else {
+        btn.disabled = false;
+        btn.textContent = "Check All Now";
+        banner("❌ Failed to start check. Make sure your GitHub Token has 'Actions: Read and write' permission.", true);
+      }
     }
 
     function render() {
@@ -176,14 +197,17 @@
         return;
       }
       list.innerHTML = configData.sites.map((s, i) => `
-        <div class="site">
+        <div class="site" style="opacity:${s.enabled ? 1 : 0.55}">
           <div>
             <strong>${s.name}</strong>
-            <span class="badge ${s.status === 'changed' ? 'changed' : ''}">${s.status || 'pending'}</span>
+            <span class="badge ${s.status === 'changed' ? 'changed' : s.status?.startsWith('error') ? 'error' : ''}">${s.enabled ? (s.status || 'pending') : 'paused'}</span>
             <span class="badge">Every ${s.interval_value} ${s.interval_unit}</span>
             <div class="meta">${s.url} • ${s.selector === 'body' ? 'Whole page' : 'Selected element'} • Checked: ${s.last_checked || 'Pending'}</div>
           </div>
-          <button class="danger" onclick="removeSite(${i})">Remove</button>
+          <div style="display:flex; gap:6px;">
+            <button class="pause" onclick="togglePause(${i})">${s.enabled ? 'Pause' : 'Resume'}</button>
+            <button class="danger" onclick="removeSite(${i})">Remove</button>
+          </div>
         </div>
       `).join("");
     }

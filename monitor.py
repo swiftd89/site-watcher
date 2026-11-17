@@ -65,8 +65,8 @@ def fetch_browser(url, playwright):
         )
     )
     page = context.new_page()
-    page.goto(url, wait_until="networkidle", timeout=45000)
-    page.wait_for_timeout(2000)
+    page.goto(url, wait_until="domcontentloaded", timeout=45000)
+    page.wait_for_timeout(3500)
     html = page.content()
     browser.close()
     return html
@@ -131,14 +131,12 @@ def is_due(site, now_utc, force=False):
         return False
     if force or not site.get("last_checked"):
         return True
-
     try:
         last_dt = datetime.strptime(site["last_checked"], "%Y-%m-%d %H:%M UTC").replace(
             tzinfo=timezone.utc
         )
     except ValueError:
         return True
-
     val = max(1, int(site.get("interval_value", 1)))
     unit = site.get("interval_unit", "days")
     required_seconds = val * UNIT_SECONDS.get(unit, 86400)
@@ -158,10 +156,15 @@ def run_once(force=False):
         print("No sites due for check right now.")
         return
 
-    needs_browser = any(s.get("use_browser") for s in due_sites)
-    pw_manager = sync_playwright().start() if needs_browser else None
+    pw_manager = None
     changes_count = 0
     checked_names = []
+
+    def get_pw():
+        nonlocal pw_manager
+        if pw_manager is None:
+            pw_manager = sync_playwright().start()
+        return pw_manager
 
     try:
         for site in due_sites:
@@ -172,12 +175,19 @@ def run_once(force=False):
             print(f"Checking {name} ({url})...")
 
             try:
-                html = (
-                    fetch_browser(url, pw_manager)
-                    if site.get("use_browser")
-                    else fetch_static(url)
-                )
-                extracted = clean_text(html, selector)
+                extracted = None
+                if not site.get("use_browser"):
+                    html = fetch_static(url)
+                    extracted = clean_text(html, selector)
+
+                # Auto-fallback to headless Chromium if JS rendering is needed
+                if extracted is None:
+                    print(f" -> Using JS browser for {name}...")
+                    html = fetch_browser(url, get_pw())
+                    extracted = clean_text(html, selector)
+                    if extracted is not None:
+                        site["use_browser"] = True
+
                 if extracted is None:
                     site["status"] = f"error: selector '{selector}' not found"
                     site["last_checked"] = now_iso
@@ -212,7 +222,6 @@ def run_once(force=False):
         if pw_manager:
             pw_manager.stop()
 
-    # Send a summary notification if sites were checked and none changed
     if checked_names and changes_count == 0:
         global_discord = (settings.get("discord_webhook") or "").strip()
         global_ntfy = (settings.get("ntfy_topic") or "").strip()
