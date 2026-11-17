@@ -48,21 +48,6 @@
       "last_checked": "2026-11-17 20:42 UTC",
       "last_changed": "2026-11-17 20:42 UTC",
       "status": "changed"
-    },
-    {
-      "id": "site-1794948086757",
-      "name": "www.uuidgenerator.net",
-      "url": "https://www.uuidgenerator.net/api/version4",
-      "selector": "pre",
-      "interval_value": 1,
-      "interval_unit": "days",
-      "notify_method": "default",
-      "notify_target": "",
-      "use_browser": false,
-      "enabled": true,
-      "last_checked": "2026-11-17 20:42 UTC",
-      "last_changed": null,
-      "status": "error: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without"
     }
   ]
 }
