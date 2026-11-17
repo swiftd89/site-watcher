@@ -51,7 +51,8 @@ def fetch_static(url):
         "User-Agent": (
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-        )
+        ),
+        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
     }
     resp = requests.get(url, headers=headers, timeout=25)
     resp.raise_for_status()
@@ -65,14 +66,20 @@ def ensure_chromium():
     )
 
 
-def fetch_browser(url, playwright):
+def fetch_browser(url, playwright, selector="body"):
     try:
-        browser = playwright.chromium.launch(headless=True)
+        browser = playwright.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled"],
+        )
     except Exception as e:
         if "Executable doesn't exist" in str(e):
             print("Installing Chromium on runner...")
             ensure_chromium()
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(
+                headless=True,
+                args=["--disable-blink-features=AutomationControlled"],
+            )
         else:
             raise
 
@@ -80,11 +87,19 @@ def fetch_browser(url, playwright):
         user_agent=(
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-        )
+        ),
+        locale="pt-BR",
+        viewport={"width": 1366, "height": 900},
     )
     page = context.new_page()
     page.goto(url, wait_until="domcontentloaded", timeout=45000)
-    page.wait_for_timeout(3500)
+    if selector and selector != "body":
+        try:
+            page.wait_for_selector(selector, timeout=8000)
+        except Exception:
+            page.wait_for_timeout(4000)
+    else:
+        page.wait_for_timeout(3500)
     html = page.content()
     browser.close()
     return html
@@ -201,13 +216,15 @@ def run_once(force=False):
 
                 if extracted is None:
                     print(f" -> Using JS browser for {name}...")
-                    html = fetch_browser(url, get_pw())
+                    html = fetch_browser(url, get_pw(), selector)
                     extracted = clean_text(html, selector)
                     if extracted is not None:
                         site["use_browser"] = True
 
                 if extracted is None:
-                    site["status"] = f"error: selector '{selector}' not found"
+                    page_title = BeautifulSoup(html, "html.parser").title
+                    title_txt = page_title.get_text(strip=True)[:40] if page_title else "no title"
+                    site["status"] = f"error: selector '{selector}' not found (page: {title_txt})"
                     site["last_checked"] = now_iso
                     checked_names.append(f"⚠️ {name} (selector not found)")
                     continue
