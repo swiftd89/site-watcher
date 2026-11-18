@@ -15,7 +15,7 @@
       "notify_target": "",
       "use_browser": false,
       "enabled": true,
-      "last_checked": "2026-11-17 21:33 UTC",
+      "last_checked": "2026-11-18 00:05 UTC",
       "last_changed": null,
       "status": "unchanged"
     },
@@ -30,7 +30,7 @@
       "notify_target": "",
       "use_browser": true,
       "enabled": true,
-      "last_checked": "2026-11-17 21:33 UTC",
+      "last_checked": "2026-11-18 00:05 UTC",
       "last_changed": null,
       "status": "unchanged"
     },
@@ -45,8 +45,8 @@
       "notify_target": "",
       "use_browser": true,
       "enabled": true,
-      "last_checked": "2026-11-17 21:33 UTC",
-      "last_changed": "2026-11-17 21:33 UTC",
+      "last_checked": "2026-11-18 00:05 UTC",
+      "last_changed": "2026-11-18 00:05 UTC",
       "status": "changed"
     }
   ]
