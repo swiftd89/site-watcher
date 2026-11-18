@@ -20,21 +20,6 @@
       "status": "unchanged"
     },
     {
-      "id": "site-1794948786487",
-      "name": "Apple - Support - System Status",
-      "url": "https://www.apple.com/support/systemstatus/",
-      "selector": "div.light-container > div.light-content.light-name > div.info-tooltip-container > button.light-link",
-      "interval_value": 5,
-      "interval_unit": "minutes",
-      "notify_method": "default",
-      "notify_target": "",
-      "use_browser": true,
-      "enabled": true,
-      "last_checked": "2026-11-18 00:09 UTC",
-      "last_changed": null,
-      "status": "unchanged"
-    },
-    {
       "id": "site-1794948811440",
       "name": "httpbin.org",
       "url": "https://httpbin.org/uuid",
