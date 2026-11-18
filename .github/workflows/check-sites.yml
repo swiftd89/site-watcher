@@ -1,8 +1,6 @@
 name: Website Change Monitor
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'
   workflow_dispatch:
     inputs:
       force_all:
