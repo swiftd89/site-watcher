@@ -18,21 +18,6 @@
       "last_checked": "2026-11-18 00:05 UTC",
       "last_changed": null,
       "status": "unchanged"
-    },
-    {
-      "id": "site-1794948811440",
-      "name": "httpbin.org",
-      "url": "https://httpbin.org/uuid",
-      "selector": "body",
-      "interval_value": 5,
-      "interval_unit": "minutes",
-      "notify_method": "default",
-      "notify_target": "",
-      "use_browser": true,
-      "enabled": true,
-      "last_checked": "2026-11-18 00:15 UTC",
-      "last_changed": "2026-11-18 00:15 UTC",
-      "status": "changed"
     }
   ]
 }
