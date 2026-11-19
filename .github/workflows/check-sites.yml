@@ -6,7 +6,7 @@ on:
       force_all:
         description: 'Force check all sites immediately (true/false)'
         required: false
-        default: 'true'
+        default: 'false'
 
 permissions:
   contents: write
