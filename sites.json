@@ -14,7 +14,7 @@
       "notify_method": "default",
       "notify_target": "",
       "use_browser": false,
-      "enabled": true,
+      "enabled": false,
       "last_checked": "2026-11-18 00:05 UTC",
       "last_changed": null,
       "status": "unchanged"
